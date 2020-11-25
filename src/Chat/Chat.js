@@ -29,17 +29,26 @@ class Chat extends Component {
     }, 1000);
   }
 
-  handleChange = (event) => {
-    this.setState({
-      inputText: event.target.value,
-    });
+  addAutoReply = (currentMessage, messageList) => {
+    let newMessageList = messageList;
+    for (let i = 0; i < answersData.length; i += 1) {
+      const answer = answersData[i];
+      for (let j = 0; j < answer.tags.length; j += 1) {
+        if (currentMessage.includes(answer.tags[j])) {
+          newMessageList = messageList.concat(answer);
+          break;
+        }
+      }
+    }
+    return newMessageList;
   };
 
   handleMessage = () => {
     const currentMessage = this.state.inputText;
     const message = { role: ROLE.CUSTOMER, text: currentMessage };
-    const messageList = this.state.messages.concat(message);
-    console.log(messageList);
+    let messageList = this.state.messages.concat(message);
+    messageList = this.addAutoReply(currentMessage, messageList);
+
     this.setState({
       inputText: '',
     });
@@ -48,6 +57,12 @@ class Chat extends Component {
         messages: messageList,
       });
     }, 1000);
+  };
+
+  handleChange = (event) => {
+    this.setState({
+      inputText: event.target.value,
+    });
   };
 
   render() {
